@@ -9,22 +9,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: run in docker
-        uses: docker://quay.io/pypa/manylinux2014_x86_64
+        uses: ./.github/actions/run-in-manylinux-amd64
         with:
-          entrypoint: "/usr/bin/uname"
-          args: "-a"
+          script: scripts/uname-a.sh
 
   run-inside-pypa-arm64:
     name: Run script in pypa arm64 container
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup QEMU
-        uses: docker/setup-qemu-action@v3
-        with:
-          platforms: arm64
       - name: run in docker
-        uses: docker://quay.io/pypa/manylinux2014_aarch64
+        uses: ./.github/actions/run-in-manylinux-arm64
         with:
-          entrypoint: "/usr/bin/uname"
-          args: "-a"
+          script: scripts/uname-a.sh
