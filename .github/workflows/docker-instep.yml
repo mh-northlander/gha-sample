@@ -1,0 +1,28 @@
+name: Use Docker container in workflow step
+
+on: push
+
+jobs:
+  run-inside-pypa-amd64:
+    name: Run script in pypa amd64 container
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: run in docker
+        uses: docker://quay.io/pypa/manylinux2014_x86_64
+        with:
+          entrypoint: "/usr/bin/uname"
+          args: "-a"
+
+  run-inside-pypa-arm64:
+    name: Run script in pypa arm64 container
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: setup qemu
+        run: apt update && apt install --yes binfmt-support qemu-user-static
+      - name: run in docker
+        uses: docker://quay.io/pypa/manylinux2014_aarch64
+        with:
+          entrypoint: "/usr/bin/uname"
+          args: "-a"
