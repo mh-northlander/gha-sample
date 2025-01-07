@@ -9,6 +9,6 @@ inputs:
     required: true
 runs:
   using: 'docker'
-  image: './Dockerfile_amd64'
+  image: 'manylinux_amd64.Dockerfile'
   args:
     - ${{ inputs.script }}
