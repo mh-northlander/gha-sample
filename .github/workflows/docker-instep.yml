@@ -9,9 +9,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: run in docker
-        uses: ./.github/actions/run-in-manylinux-amd64
+        uses: ./.github/actions/run-in-manylinux
         with:
           script: scripts/uname-a.sh
+          arch: amd64
 
   run-inside-pypa-arm64:
     name: Run script in pypa arm64 container
@@ -19,6 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: run in docker
-        uses: ./.github/actions/run-in-manylinux-arm64
+        uses: ./.github/actions/run-in-manylinux
         with:
           script: scripts/uname-a.sh
+          arch: arm64
