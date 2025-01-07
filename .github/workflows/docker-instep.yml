@@ -4,7 +4,7 @@ on: push
 
 jobs:
   run-inside-pypa:
-    name: Run script in pypa ${{matrix}} container
+    name: Run script in pypa ${{ matrix.arch }} container
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -12,7 +12,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: git clone https://github.com/WorksApplications/sudachi.rs.git
-      - run: bash sudachi.rs/fetch_dictionary.sh "20220519" "core"
+      - run: |
+          cd sudachi.rs/
+          bash fetch_dictionary.sh "20220519" "core"
       - name: run in docker
         uses: ./.github/actions/run-in-manylinux
         with:
