@@ -8,17 +8,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: clone sudachipy
+        run: git clone https://github.com/WorksApplications/sudachi.rs.git
       - name: run in docker
         uses: docker://quay.io/pypa/manylinux2014_x86_64
         with:
-          entrypoint: "/usr/bin/uname"
-          args: "-a"
+          entrypoint: scripts/build-wheels-manylinux-pgo.sh
+      - name: list wheels
+        run: ls sudachi.rs/python/dist/
 
   run-inside-pypa-arm64:
     name: Run script in pypa arm64 container
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: clone sudachipy
+        run: git clone https://github.com/WorksApplications/sudachi.rs.git
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v3
         with:
@@ -26,5 +31,6 @@ jobs:
       - name: run in docker
         uses: docker://quay.io/pypa/manylinux2014_aarch64
         with:
-          entrypoint: "/usr/bin/uname"
-          args: "-a"
+          entrypoint: scripts/build-wheels-manylinux-pgo.sh
+      - name: list wheels
+        run: ls sudachi.rs/python/dist/
