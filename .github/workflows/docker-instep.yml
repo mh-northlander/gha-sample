@@ -19,8 +19,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: setup qemu
-        run: apt update && apt install --yes binfmt-support qemu-user-static
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
       - name: run in docker
         uses: docker://quay.io/pypa/manylinux2014_aarch64
         with:
