@@ -17,7 +17,7 @@ runs:
       if: ${{ inputs.arch == 'arm64' }}
       uses: docker/setup-qemu-action@v3
       with:
-        platforms: arm64      
+        platforms: ${{ inputs.arch }}
 
     - name: run script (amd64)
       if: ${{ inputs.arch == 'amd64' }}
