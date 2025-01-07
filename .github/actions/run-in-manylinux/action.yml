@@ -14,18 +14,18 @@ runs:
   using: 'composite'
   steps:
     - name: setup qemu for arm64 architecture
-      if: ${{ inputs.arch == "arm64" }}
+      if: ${{ inputs.arch == 'arm64' }}
       uses: docker/setup-qemu-action@v3
       with:
         platforms: arm64      
 
-    - name: run sctipt (amd64)
-      if: ${{ inputs.arch == "amd64" }}
+    - name: run script (amd64)
+      if: ${{ inputs.arch == 'amd64' }}
       uses: ./.github/actions/run-in-manylinux-amd64
       with:
         script: ${{ inputs.script }}
-    - name: run sctipt (arm64)
-      if: ${{ inputs.arch == "arm64" }}
+    - name: run script (arm64)
+      if: ${{ inputs.arch == 'arm64' }}
       uses: ./.github/actions/run-in-manylinux-arm64
       with:
         script: ${{ inputs.script }}
