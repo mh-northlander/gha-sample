@@ -1,0 +1,23 @@
+name: Use Docker container in workflow step
+
+on: push
+
+jobs:
+  run-inside-pypa:
+    name: Run script in pypa ${{ matrix.arch }} container
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: ["amd64", "arm64"]
+    steps:
+      - uses: actions/checkout@v4
+      - run: git clone https://github.com/WorksApplications/sudachi.rs.git
+      - run: |
+          cd sudachi.rs/
+          bash fetch_dictionary.sh "20220519" "core"
+      - name: run in docker
+        uses: ./.github/actions/run-in-manylinux
+        with:
+          script: scripts/build-wheels-manylinux-pgo.sh
+          arch: ${{ matrix.arch }}
+      - run: ls sudachi.rs/python/dist

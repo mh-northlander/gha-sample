@@ -15,9 +15,22 @@ jobs:
       - run: |
           cd sudachi.rs/
           bash fetch_dictionary.sh "20220519" "core"
-      - name: run in docker
-        uses: ./.github/actions/run-in-manylinux
+
+      - name: run in docker (amd64)
+        if: ${{ matrix.arch == 'amd64' }}
+        uses: docker://quay.io/pypa/manylinux2014_x86_64
         with:
-          script: scripts/build-wheels-manylinux-pgo.sh
-          arch: ${{ matrix.arch }}
+          entrypoint: scripts/build-wheels-manylinux-pgo.sh
+
+      - name: setup qemu
+        if: ${{ matrix.arch == 'arm64' }}
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: arm64
+      - name: run in docker (arm64)
+        if: ${{ matrix.arch == 'arm64' }}
+        uses: docker://quay.io/pypa/manylinux2014_aarch64
+        with:
+          entrypoint: scripts/build-wheels-manylinux-pgo.sh
+
       - run: ls sudachi.rs/python/dist
