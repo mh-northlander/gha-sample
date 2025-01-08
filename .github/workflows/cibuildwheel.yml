@@ -51,6 +51,7 @@ jobs:
         run: bash build-sdist.sh
 
       - name: cibuildwheel ${{ matrix.platform || matrix.os }}
+        working-directory: ./sudachi.rs/python
         env:
             CIBW_PLATFORM: ${{ matrix.platform || matrix.os }}
             CIBW_BUILD: '${{ matrix.python-version }}-*'
@@ -71,7 +72,7 @@ jobs:
             # CIBW_TEST_REQUIRES: pytest requests
             # CIBW_TEST_SKIP: '*-macosx_arm64 *-macosx_universal2:arm64'
             CIBW_BUILD_VERBOSITY: 1
-        run: cibuildwheel --output-dir python/dist
+        run: cibuildwheel --output-dir dist/
  
       - name: show
-        run: ls python/dist/
+        run: ls ./sudachi.rs/python/dist/
