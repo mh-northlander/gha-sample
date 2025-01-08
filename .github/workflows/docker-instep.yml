@@ -1,6 +1,8 @@
 name: Use Docker container in workflow step
 
-on: push
+on: 
+  pull_request:
+      branches: ["main"]
 
 jobs:
   run-inside-pypa:
@@ -17,6 +19,7 @@ jobs:
           bash fetch_dictionary.sh "20220519" "core"
 
       - name: run in docker (amd64)
+        # this faild with script permission
         if: ${{ matrix.arch == 'amd64' }}
         uses: docker://quay.io/pypa/manylinux2014_x86_64
         with:

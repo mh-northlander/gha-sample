@@ -1,0 +1,77 @@
+name: Use cibuildwheel
+
+on: 
+    push:
+    pull_request:
+        branches: ["main"]
+
+jobs:
+  build-with-cibuildwheel:
+    name: build using cibuildwheel
+    runs-on: ${{ format('{0}-latest', matrix.os) }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ["ubuntu", "macos", "windows"]
+        python-version: ["cp39", "cp313"]
+        include:
+            - os: "ubuntu"
+              platform: "linux"
+    env:
+      mainJob: ${{ matrix.os == 'ubuntu' && matrix.python-version == 'cp39' }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - run: git clone https://github.com/WorksApplications/sudachi.rs.git
+      - run: |
+          cd sudachi.rs/
+          bash fetch_dictionary.sh "20220519" "core"
+      
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+            python -m pip install --upgrade pip
+            python -m pip install --upgrade setuptools setuptools-rust build cibuildwheel
+        
+      - uses: actions/cache@v4
+        with:
+            path: |
+                ~/.cargo/bin/
+                ~/.cargo/registry/index/
+                ~/.cargo/registry/cache/
+                ~/.cargo/git/db/
+                target/
+            key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: build sdist
+        if: ${{ env.mainJob == 'true' }}
+        working-directory: ./sudachi.rs/python
+        run: bash build-sdist.sh
+
+      - name: cibuildwheel ${{ matrix.platform || matrix.os }}
+        env:
+            CIBW_PLATFORM: ${{ matrix.platform || matrix.os }}
+            CIBW_BUILD: '${{ matrix.python-version }}-*'
+            # rust doesn't seem to be available for musl linux on i686
+            # CIBW_SKIP: '*-musllinux_i686'
+            # we build for "alt_arch_name" if it exists, else 'auto'
+            CIBW_ARCHS: 'auto'
+            # CIBW_ARCHS: ${{ matrix.alt_arch_name || 'auto' }}
+            CIBW_ENVIRONMENT: 'PATH="$HOME/.cargo/bin:$PATH" CARGO_TERM_COLOR="always"'
+            CIBW_ENVIRONMENT_WINDOWS: 'PATH="$UserProfile\.cargo\bin;$PATH"'
+            CIBW_MANYLINUX_X86_64_IMAGE: 'manylinux2014'
+            CIBW_MANYLINUX_I686_IMAGE: 'manylinux2014'
+            CIBW_BEFORE_BUILD: rustup show
+            CIBW_BEFORE_BUILD_LINUX: >
+                curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain=stable --profile=minimal -y &&
+                rustup show
+            # CIBW_TEST_COMMAND: 'pytest {project}/test'
+            # CIBW_TEST_REQUIRES: pytest requests
+            # CIBW_TEST_SKIP: '*-macosx_arm64 *-macosx_universal2:arm64'
+            CIBW_BUILD_VERBOSITY: 1
+        run: cibuildwheel --output-dir python/dist
+ 
+      - name: show
+        run: ls python/dist/
