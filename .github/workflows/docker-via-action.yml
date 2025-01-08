@@ -15,9 +15,16 @@ jobs:
       - run: |
           cd sudachi.rs/
           bash fetch_dictionary.sh "20220519" "core"
-      - name: run in docker
+      - name: run in docker (amd64)
+        if: ${{ matrix.arch == 'amd64' }}
         uses: ./.github/actions/run-in-manylinux
         with:
           script: scripts/build-wheels-manylinux-pgo.sh
+          arch: ${{ matrix.arch }}
+      - name: run in docker (arm64)
+        if: ${{ matrix.arch == 'arm64' }}
+        uses: ./.github/actions/run-in-manylinux
+        with:
+          script: scripts/build-wheels-manylinux.sh
           arch: ${{ matrix.arch }}
       - run: ls sudachi.rs/python/dist
