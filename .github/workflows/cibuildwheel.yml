@@ -12,7 +12,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu", "macos", "windows"]
+        os: ["ubuntu"]
+        # os: ["ubuntu", "macos", "windows"]
         # arch: ["x86_64", "aarch64"]
         include:
             - os: "ubuntu"
@@ -89,10 +90,10 @@ jobs:
             CIBW_ENVIRONMENT_LINUS: 'PATH="$HOME/.cargo/bin:$PATH" CARGO_TERM_COLOR="always" RUSTFLAGS="-C profile-use=/tmp/sudachi-profdata.merged -C opt-level=3" '
             CIBW_ENVIRONMENT_WINDOWS: 'PATH="$UserProfile\.cargo\bin;$PATH"'
             CIBW_ENVIRONMENT_MACOS: 'PATH="$HOME/.cargo/bin:$PATH" CARGO_TERM_COLOR="always" MACOSX_DEPLOYMENT_TARGET=10.12'
+            CIBW_BEFORE_ALL_LINUX: >
+                chmod +x python/generate-manylinux-profile.sh
+                python/generate-manylinux-profile.sh
             CIBW_BEFORE_BUILD: >
-                rustup show
-            CIBW_BEFORE_BUILD_LINUX: >
-                python/generate-manylinux-profile.sh &&
                 rustup show
             # CIBW_TEST_COMMAND: 'pytest {project}/test'
             # CIBW_TEST_REQUIRES: pytest requests
