@@ -75,12 +75,11 @@ jobs:
             CIBW_ARCHS: ${{ matrix.arch || 'auto' }}
             CIBW_MANYLINUX_X86_64_IMAGE: 'manylinux2014'
             CIBW_MANYLINUX_AARCH64_IMAGE: 'manylinux2014'
-            CIBW_ENVIRONMENT_LINUS: 'PATH="$HOME/.cargo/bin:$PATH" CARGO_TERM_COLOR="always" RUSTFLAGS="-C profile-use=/tmp/sudachi-profdata.merged -C opt-level=3" '
+            CIBW_ENVIRONMENT_LINUX: 'PATH="$HOME/.cargo/bin:$PATH" CARGO_TERM_COLOR="always" RUSTFLAGS="-C profile-use=/tmp/sudachi-profdata.merged -C opt-level=3" '
             CIBW_ENVIRONMENT_WINDOWS: 'PATH="$UserProfile\.cargo\bin;$PATH"'
             CIBW_ENVIRONMENT_MACOS: 'PATH="$HOME/.cargo/bin:$PATH" CARGO_TERM_COLOR="always" MACOSX_DEPLOYMENT_TARGET=10.12'
             CIBW_BEFORE_ALL_LINUX: >
                 curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain stable -y --no-modify-path --component llvm-tools &&
-                export PATH="$HOME/.cargo/bin:$PATH" &&
                 chmod +x python/generate-manylinux-profile.sh &&
                 python/generate-manylinux-profile.sh
             CIBW_BEFORE_BUILD: >
