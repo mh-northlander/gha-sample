@@ -17,11 +17,11 @@ jobs:
         include:
             - os: "ubuntu"
               platform: "linux"
-              arch: ["x86_64", "aarch64"]
+              arch: "x86_64 aarch64"
             - os: "macos"
               arch: "universal2"
             - os: "windows"
-              arch: "amd64"
+              arch: "AMD64"
     env:
       mainJob: ${{ matrix.os == 'ubuntu' && matrix.arch == 'x86_64' }}
 
@@ -39,7 +39,15 @@ jobs:
         run: |
             python -m pip install --upgrade pip
             python -m pip install --upgrade setuptools setuptools-rust build cibuildwheel
-        
+      - name: Add aarch64/x86 target for Rust / macos
+        if: ${{ matrix.os == 'macos' }}
+        run: rustup target add aarch64-apple-darwin x86_64-apple-darwin
+      - name: setup qemu
+        if: ${{ matrix.os == 'ubuntu' }}
+        uses: docker/setup-qemu-action@v3
+        with:
+          platforms: all
+
       - uses: actions/cache@v4
         with:
             path: |
