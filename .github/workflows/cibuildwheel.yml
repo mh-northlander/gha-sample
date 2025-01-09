@@ -19,10 +19,10 @@ jobs:
             - os: "ubuntu"
               platform: "linux"
               arch: "x86_64"
-            - os: "macos"
-              arch: "universal2"
-            - os: "windows"
-              arch: "AMD64"
+            # - os: "macos"
+            #   arch: "universal2"
+            # - os: "windows"
+            #   arch: "AMD64"
     env:
       mainJob: ${{ matrix.os == 'ubuntu' && matrix.arch == 'x86_64' }}
 
@@ -91,7 +91,7 @@ jobs:
             CIBW_ENVIRONMENT_WINDOWS: 'PATH="$UserProfile\.cargo\bin;$PATH"'
             CIBW_ENVIRONMENT_MACOS: 'PATH="$HOME/.cargo/bin:$PATH" CARGO_TERM_COLOR="always" MACOSX_DEPLOYMENT_TARGET=10.12'
             CIBW_BEFORE_ALL_LINUX: >
-                chmod +x python/generate-manylinux-profile.sh
+                chmod +x python/generate-manylinux-profile.sh &&
                 python/generate-manylinux-profile.sh
             CIBW_BEFORE_BUILD: >
                 rustup show
