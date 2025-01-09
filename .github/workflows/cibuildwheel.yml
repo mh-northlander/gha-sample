@@ -13,10 +13,15 @@ jobs:
       fail-fast: false
       matrix:
         os: ["ubuntu", "macos", "windows"]
-        arch: ["x86_64", "aarch64"]
+        # arch: ["x86_64", "aarch64"]
         include:
             - os: "ubuntu"
               platform: "linux"
+              arch: ["x86_64", "aarch64"]
+            - os: "macos"
+              arch: "universal2"
+            - os: "windows"
+              arch: "amd64"
     env:
       mainJob: ${{ matrix.os == 'ubuntu' && matrix.arch == 'x86_64' }}
 
@@ -66,29 +71,27 @@ jobs:
         working-directory: ./sudachi.rs/
         env:
             CIBW_PLATFORM: ${{ matrix.platform || matrix.os }}
-            CIBW_BUILD: '${{ matrix.python-version }}-*'
+            # CIBW_BUILD: '${{ matrix.python-version }}-*'
+            CIBW_BUILD: 'cp39-* cp313-*'
             CIBW_SKIP: '*-win32'
             # rust doesn't seem to be available for musl linux on i686
             # CIBW_SKIP: '*-musllinux_i686'
             # we build for "alt_arch_name" if it exists, else 'auto'
-            CIBW_ARCHS: 'auto'
-            # CIBW_ARCHS: ${{ matrix.alt_arch_name || 'auto' }}
+            CIBW_ARCHS: ${{ matrix.arch || 'auto' }}
             CIBW_ENVIRONMENT: 'PATH="$HOME/.cargo/bin:$PATH" CARGO_TERM_COLOR="always"'
             CIBW_ENVIRONMENT_WINDOWS: 'PATH="$UserProfile\.cargo\bin;$PATH"'
             CIBW_MANYLINUX_X86_64_IMAGE: 'manylinux2014'
             CIBW_MANYLINUX_I686_IMAGE: 'manylinux2014'
             CIBW_BEFORE_BUILD: >
-                cd python/ &&
                 rustup show
             CIBW_BEFORE_BUILD_LINUX: >
                 curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain=stable --profile=minimal -y &&
-                cd python/ &&
                 rustup show
             # CIBW_TEST_COMMAND: 'pytest {project}/test'
             # CIBW_TEST_REQUIRES: pytest requests
             # CIBW_TEST_SKIP: '*-macosx_arm64 *-macosx_universal2:arm64'
             CIBW_BUILD_VERBOSITY: 1
-        run: cibuildwheel --output-dir dist/
+        run: cibuildwheel python/ --output-dir python/dist/
  
       - name: show
         run: ls ./sudachi.rs/python/dist/
