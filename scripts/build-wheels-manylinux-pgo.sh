@@ -6,7 +6,7 @@ set -ex
 DIR=$(dirname "$(readlink -f "$0")")
 cd "$DIR/.."
 
-curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain stable -y --no-modify-path --component llvm-tools-preview
+curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain stable -y --no-modify-path --component llvm-tools
 export PATH="$HOME/.cargo/bin:$PATH"
 
 cd sudachi.rs/
