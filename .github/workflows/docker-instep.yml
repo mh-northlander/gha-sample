@@ -1,8 +1,7 @@
 name: Use Docker container in workflow step
 
-on: 
-  pull_request:
-      branches: ["main"]
+on:
+  workflow_dispatch:
 
 jobs:
   run-inside-pypa:
