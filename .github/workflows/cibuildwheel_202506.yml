@@ -1,0 +1,87 @@
+name: Use cibuildwheel
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build-with-cibuildwheel:
+    name: build using cibuildwheel
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # macos-13 is an intel runner, macos-14 is apple silicon
+        os:
+          [ubuntu-latest, ubuntu-24.04-arm, windows-latest, macos-13, macos-14]
+    env:
+      mainJob: ${{ matrix.os == 'ubuntu-latest' }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - run: git clone https://github.com/WorksApplications/sudachi.rs.git
+      - name: copy/overwrite scripts
+        run: |
+          cp scripts/generate-manylinux-profile.sh sudachi.rs/python/
+          cp pyproject.toml sudachi.rs/python/pyproject.toml
+      - run: |
+          cd sudachi.rs/
+          bash fetch_dictionary.sh "20220519" "core"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade setuptools setuptools-rust build cibuildwheel
+      - name: Add aarch64/x86 target for macos
+        if: ${{ matrix.os == 'macos' }}
+        run: rustup target add aarch64-apple-darwin x86_64-apple-darwin
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: build sdist
+        if: ${{ env.mainJob == 'true' }}
+        working-directory: ./sudachi.rs/python
+        run: bash build-sdist.sh
+
+      - name: cibuildwheel ${{ matrix.os }}
+        uses:
+          pypa/cibuildwheel@v3.0.0
+          # env:
+          ## most configuration are in python/pyproject.toml
+          # CIBW_PLATFORM: ${{ matrix.platform || matrix.os }}
+          # CIBW_ARCHS: ${{ matrix.arch }}
+        with:
+          package-dir: sudachi.rs/python
+          output-dir: sudachi.rs/python/dist
+          config-file: "{package}/pyproject.toml"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: artifact-${{ matrix.os }}
+          path: |
+            ./sudachi.rs/python/dist/*.whl
+            ./sudachi.rs/python/dist/*.tar.gz
+
+  list-wheels:
+    needs: [build-with-cibuildwheel]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: artifact-*
+          path: dist/
+          merge-multiple: true
+
+      - name: List files to upload
+        run: ls -R dist/
