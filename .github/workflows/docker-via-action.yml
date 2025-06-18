@@ -1,4 +1,4 @@
-name: Use Docker container in workflow step
+name: Use Docker container via ghaction
 
 on:
   workflow_dispatch:
@@ -16,23 +16,17 @@ jobs:
       - run: |
           cd sudachi.rs/
           bash fetch_dictionary.sh "20220519" "core"
-
       - name: run in docker (amd64)
-        # this faild with script permission
         if: ${{ matrix.arch == 'amd64' }}
-        uses: docker://quay.io/pypa/manylinux2014_x86_64
+        uses: ./.github/actions/run-in-manylinux
         with:
-          entrypoint: scripts/build-wheels-manylinux-pgo.sh
-
-      - name: setup qemu
-        if: ${{ matrix.arch == 'arm64' }}
-        uses: docker/setup-qemu-action@v3
-        with:
-          platforms: arm64
+          script: scripts/build-wheels-manylinux-pgo.sh
+          arch: ${{ matrix.arch }}
       - name: run in docker (arm64)
+        # this will take too long and canceled
         if: ${{ matrix.arch == 'arm64' }}
-        uses: docker://quay.io/pypa/manylinux2014_aarch64
+        uses: ./.github/actions/run-in-manylinux
         with:
-          entrypoint: scripts/build-wheels-manylinux-pgo.sh
-
+          script: scripts/build-wheels-manylinux.sh
+          arch: ${{ matrix.arch }}
       - run: ls sudachi.rs/python/dist
