@@ -17,6 +17,7 @@ environment = { PATH = "$PATH:$HOME/.cargo/bin", CARGO_TERM_COLOR = "always", RU
 before-all = "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain stable -y --no-modify-path --component llvm-tools && cd sudachi.rs && python/generate-manylinux-profile.sh"
 
 [tool.cibuildwheel.macos]
+archs = ["x86_64", "universal2", "arm64"]
 environment = { PATH = "$PATH:$HOME/.cargo/bin", CARGO_TERM_COLOR = "always", MACOSX_DEPLOYMENT_TARGET = "10.12" }
 before-all = "rustup target add aarch64-apple-darwin x86_64-apple-darwin"
 
