@@ -14,10 +14,11 @@ before-build = "rustup update && rustup show && rustc --version"
 
 [tool.cibuildwheel.linux]
 environment = { PATH = "$HOME/.cargo/bin:$PATH", CARGO_TERM_COLOR = "always", RUSTFLAGS = "-C profile-use=/tmp/sudachi-profdata.merged -C opt-level=3" }
-before-all = "curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain stable -y --no-modify-path --component llvm-tools && cd sudachi.rs && python/generate-manylinux-profile.sh"
+before-all = "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain stable -y --no-modify-path --component llvm-tools && cd sudachi.rs && python/generate-manylinux-profile.sh"
 
 [tool.cibuildwheel.macos]
 environment = { PATH = "$HOME/.cargo/bin:$PATH", CARGO_TERM_COLOR = "always" }
+before-all = "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- --default-toolchain stable -y --no-modify-path"
 
 [tool.cibuildwheel.windows]
 environment = { PATH = "$UserProfile\\.cargo\\bin;$PATH" }
