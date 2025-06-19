@@ -10,7 +10,7 @@ manylinux-x86_64-image = "manylinux2014"
 manylinux-aarch64-image = "manylinux2014"
 
 build-verbosity = 1
-before-build = "which rustup && ls $HOME/.cargo/bin && echo $PATH && rustup show && rustc --version"
+before-build = "which rustup && ls $HOME/.cargo/bin && echo $HOME && echo $PATH && rustup show && which rustc && rustc --version"
 
 [tool.cibuildwheel.linux]
 environment = { PATH = "$HOME/.cargo/bin:$PATH", CARGO_TERM_COLOR = "always", RUSTFLAGS = "-C profile-use=/tmp/sudachi-profdata.merged -C opt-level=3" }
